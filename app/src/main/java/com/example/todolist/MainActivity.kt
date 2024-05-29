@@ -1,45 +1,41 @@
 package com.example.todolist
 
+import android.content.DialogInterface
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.util.Collections
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), DialogCloseListener {
     private lateinit var taskView: RecyclerView
     private lateinit var taskAdapter: ToDoAdapter
     private lateinit var taskList: MutableList<ToDoItemModel>
+    private lateinit var db: DbHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        db = DbHandler(this)
+        db.openDatabase()
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
 
-        taskList = ArrayList();
-
         taskView = findViewById(R.id.ToDoRecyclerView)
         taskView.layoutManager = LinearLayoutManager(this)
         taskAdapter = ToDoAdapter(this)
-        taskView.setAdapter(taskAdapter)
+        taskView.adapter = taskAdapter
 
-
-        taskList = mutableListOf()//initialize list
-
-        //add default list item test
-        val task = ToDoItemModel()
-        task.task= "This is a test task"
-        task.status = 0
-        task.id = 1
-
-        taskList.add(task)
-        taskList.add(task)
-        taskList.add(task)
-        taskList.add(task)
-        taskList.add(task)
-
+        taskList = db.getAllTasks()
+        Collections.reverse(taskList)
         taskAdapter.setTasks(taskList)
+    }
+
+    override fun handleDialogClose(dialog: DialogInterface) {
+        taskList = db.getAllTasks()
+        Collections.reverse(taskList)
+        taskAdapter.setTasks(taskList)
+        taskAdapter.notifyDataSetChanged()
     }
 }
