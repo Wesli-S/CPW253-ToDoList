@@ -18,7 +18,8 @@
             android:nestedScrollingEnabled="true"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:layout_editor_absoluteX="13dp"
-            tools:layout_editor_absoluteY="117dp" />
+            tools:layout_editor_absoluteY="117dp"
+            tools:ignore="MissingConstraints" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
