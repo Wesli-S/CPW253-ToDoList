@@ -1,76 +1,68 @@
-package com.example.todolist;
+package com.example.todolist
 
-import android.content.Context;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
+import android.content.Context
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.CheckBox
+import androidx.recyclerview.widget.RecyclerView
 
-import androidx.recyclerview.widget.RecyclerView;
-import java.util.List;
+class ToDoAdapter(private val db: DbHandler, private val mainActivity: MainActivity) :
+    RecyclerView.Adapter<ToDoAdapter.ViewHolder>() {
 
-public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
-    private List<ToDoItemModel> todoList;
-    private MainActivity mainActivity;
-    private DbHandler db;
+    private var todoList: List<ToDoItemModel> = emptyList()
 
-    public ToDoAdapter(DbHandler db, MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
-        this.db = db;
-    }
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.task_layout, parent, false);
-        return new ViewHolder(itemView);
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val itemView = LayoutInflater.from(parent.context)
+            .inflate(R.layout.task_layout, parent, false)
+        return ViewHolder(itemView)
     }
 
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        db.openDatabase();
-        ToDoItemModel item = todoList.get(position);
-        holder.task.setText(item.getTask());
-        holder.task.setChecked(toBoolean(item.getStatus()));
-        holder.task.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    db.updateTaskStatus(item.getID(), 1);
-                } else {
-                    db.updateTaskStatus(item.getID(), 0);
-                }
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        db.openDatabase()
+        val item = todoList[position]
+        holder.task.text = item.task
+        holder.task.isChecked = item.status != 0
+        holder.task.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                db.updateTaskStatus(item.id, 1)
+            } else {
+                db.updateTaskStatus(item.id, 0)
             }
-        });
-    }
-    public int getItemCount() {
-        return todoList.size();
-    }
-    private boolean toBoolean(int n) {
-        return n != 0;
-    }
-
-    public void setTasks(List<ToDoItemModel> todoList) {
-        this.todoList = todoList;
-    }
-    public Context getContext() {
-        return mainActivity;
-    }
-    public void editTask(int position) {
-        ToDoItemModel item = todoList.get(position);
-        Bundle bundle = new Bundle();
-        bundle.putInt("id", item.getID());
-        bundle.putString("task", item.getTask());
-        AddNewToDoTask fragment = new AddNewToDoTask();
-        fragment.setArguments(bundle);
-        fragment.show(mainActivity.getSupportFragmentManager(), AddNewToDoTask.TAG);
-    }
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        CheckBox task;
-        ViewHolder(View itemView) {
-            super(itemView);
-            //taskName = itemView.findViewById(R.id.taskName);
-            task = itemView.findViewById(R.id.todoCheckBox);//add binding here later
         }
+    }
 
+    override fun getItemCount(): Int = todoList.size
+
+    private fun toBoolean(n: Int): Boolean = n != 0
+
+    fun setTasks(todoList: List<ToDoItemModel>) {
+        this.todoList = todoList
+    }
+
+    fun getContext(): Context = mainActivity
+
+    fun deleteTask(position: Int) {
+        val item = todoList[position]
+        db.deleteTask(item.id)
+        todoList.drop(position)
+        notifyItemRemoved(position)
+    }
+
+    fun editTask(position: Int) {
+        val item = todoList[position]
+        val bundle = Bundle().apply {
+            putInt("id", item.id)
+            putString("task", item.task)
+        }
+        val fragment = AddNewToDoTask().apply {
+            arguments = bundle
+        }
+        fragment.show(mainActivity.supportFragmentManager, AddNewToDoTask.TAG)
+    }
+
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val task: CheckBox = itemView.findViewById(R.id.todoCheckBox)
     }
 }
