@@ -43,9 +43,10 @@ class DbHandler(context: Context) : SQLiteOpenHelper(context, NAME, null, VERSIO
     }
 
     @SuppressLint("Range")
-    fun getAllTasks(): List<ToDoItemModel> {
+    fun getAllTasks(): MutableList<ToDoItemModel> {
         val tasks = mutableListOf<ToDoItemModel>()
-        val cursor = db?.query(TABLE, null, null, null, null, null, null)
+        val cursor = db?.query(TABLE, null, null, null,
+            null, null, null)
 
         cursor?.use {
             if (it.moveToFirst()) {

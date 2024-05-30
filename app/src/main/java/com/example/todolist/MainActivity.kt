@@ -14,13 +14,14 @@ class MainActivity : AppCompatActivity(), DialogCloseListener {
     private lateinit var taskAdapter: ToDoAdapter
     private lateinit var addButton: FloatingActionButton
 
-    private lateinit var taskList: List<ToDoItemModel>
+    private lateinit var taskList: MutableList<ToDoItemModel>
     private lateinit var db: DbHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         db = DbHandler(this)
         db.openDatabase()
+        db.getAllTasks()
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
@@ -29,6 +30,12 @@ class MainActivity : AppCompatActivity(), DialogCloseListener {
         taskView.layoutManager = LinearLayoutManager(this)
         taskAdapter = ToDoAdapter(db, this)
         taskView.adapter = taskAdapter
+
+        ToDoItemModel().apply {
+            task = "Test"
+            status = 0
+            id = 1
+        }
 
         addButton = findViewById(R.id.fab)
 

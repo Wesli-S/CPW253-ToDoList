@@ -16,9 +16,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/newTaskText"
         android:layout_alignParentEnd="true"
-        android:text="Save"
+        android:text="Submit new task"
         android:textAllCaps="false"
-        android:background="@android:color/transparent"
+        android:background="@android:color/holo_purple"
         android:textColor="@android:color/darker_gray"/>
 
 </RelativeLayout>

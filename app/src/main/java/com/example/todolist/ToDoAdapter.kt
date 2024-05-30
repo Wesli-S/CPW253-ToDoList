@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 class ToDoAdapter(private val db: DbHandler, private val mainActivity: MainActivity) :
     RecyclerView.Adapter<ToDoAdapter.ViewHolder>() {
 
-    private var todoList: List<ToDoItemModel> = emptyList()
+    private var todoList: MutableList<ToDoItemModel> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context)
@@ -37,7 +37,7 @@ class ToDoAdapter(private val db: DbHandler, private val mainActivity: MainActiv
 
     private fun toBoolean(n: Int): Boolean = n != 0
 
-    fun setTasks(todoList: List<ToDoItemModel>) {
+    fun setTasks(todoList: MutableList<ToDoItemModel>) {
         this.todoList = todoList
     }
 
@@ -46,7 +46,7 @@ class ToDoAdapter(private val db: DbHandler, private val mainActivity: MainActiv
     fun deleteTask(position: Int) {
         val item = todoList[position]
         db.deleteTask(item.id)
-        todoList.drop(position)
+        todoList.removeAt(position)
         notifyItemRemoved(position)
     }
 
